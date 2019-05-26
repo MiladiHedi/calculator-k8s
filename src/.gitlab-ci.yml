@@ -1,0 +1,37 @@
+before_script:
+  - docker info
+  - whoami
+
+stages:
+  - test
+  - publish
+
+job:test:
+  tags:
+    - build
+  before_script:
+    - docker run --name postgres-test -d -e "POSTGRES_PASSWORD=postgres" -p 5432:5432 postgres    
+    - docker build -t $DOCKER_HUB_ID/fib-client -f ./client/DockerFile.dev
+    - docker build -t $DOCKER_HUB_ID/fib-server -f ./server/DockerFile.dev
+    - docker build -t $DOCKER_HUB_ID/fib-worker -f ./worker/DockerFile.dev
+  script:
+
+    - docker run $DOCKER_HUB_ID/fib-client npm test -- --coverage
+    - docker run $DOCKER_HUB_ID/fib-server npm test -- --coverage
+    - docker run $DOCKER_HUB_ID/fib-worker npm test -- --coverage
+  after_script:
+    - docker rm -f postgres-test
+
+job:publish:
+  tags:
+    - build
+  before_script:
+    - docker login -u $DOCKER_HUB_ID  -p $DOCKER_HUB_PASS 
+  script:
+    - docker push $DOCKER_HUB_ID/fib-client:latest"
+    - docker push $DOCKER_HUB_ID/fib-server:latest"
+    - docker push $DOCKER_HUB_ID/fib-worker:latest"
+  when: on_success
+  only:
+    - master
+

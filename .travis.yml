@@ -1,0 +1,32 @@
+sudo: required
+
+service: 
+  - docker
+
+before_install:
+  - docker build -t web-test ./src/web/ -f ./src/web/Dockerfile.dev
+
+script:
+  - docker run web-test npm test -- --coverage
+ 
+after_success:
+  - docker build -t hedimiladi/calculator-web:latest ./src/web
+  - docker build -t hedimiladi/calculator-daemon:latest ./src/calculator-daemon
+  - docker build -t hedimiladi/calculator-power-api:latest ./src/power-api
+  - docker build -t hedimiladi/calculator-power-handler:latest ./src/power-handler 
+  - docker build -t hedimiladi/calculator-postgres:latest ./src/postgres
+  - docker build -t hedimiladi/calculator-factorial-api:latest ./src/factorial-api
+  - docker build -t hedimiladi/calculator-factorial-handler:latest ./src/factorial-handler
+  # nginx image is only required to deploy calculator app in minikube
+  - docker build -t hedimiladi/calculator-nginx ./src/nginx
+
+  - echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_ID" --password-stdin
+
+  - docker push hedimiladi/calculator-web:latest
+  - docker push hedimiladi/calculator-daemon:latest
+  - docker push hedimiladi/calculator-power-api:latest
+  - docker push hedimiladi/calculator-power-handler:latest
+  - docker push hedimiladi/calculator-postgres:latest
+  - docker push hedimiladi/calculator-factorial-api:latest
+  - docker push hedimiladi/calculator-factorial-handler:latest
+  - docker push hedimiladi/calculator-nginx:latest

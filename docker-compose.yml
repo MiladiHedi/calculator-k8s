@@ -1,0 +1,107 @@
+version: "3"
+
+services:
+
+  postgres:
+    build:
+      context: ./src/postgres
+
+  redis:
+    image: redis:latest
+
+  nginx:
+    build:
+      context: ./src/nginx
+      dockerfile: Dockerfile
+    ports:
+      - 8005:80
+    restart: always
+
+  power-api: 
+    build:
+      context: ./src/power-api
+    volumes:
+      - /app/node_modules
+      - ./src/power-api:/app
+    environment:
+      - OWN_PORT=5000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_pwd
+      - PGPORT=5432
+    ports:
+      - 5000:5000
+
+  factorial-api: 
+    build:
+      context: ./src/factorial-api
+    volumes:
+      - /app/node_modules
+      - ./src/factorial-api:/app
+    environment:
+      - OWN_PORT=5001
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_pwd
+      - PGPORT=5432
+    ports:
+      - 5001:5001
+
+  web:
+    build:
+      context: ./src/web
+    volumes: 
+      - /app/node_modules
+      - ./src/web:/app
+    ports:
+      - 3010:3000
+      - 81:81
+
+  power-handler:
+    build:
+      context: ./src/power-handler
+    volumes:
+      - /app/node_modules
+      - ./src/power-handler:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_pwd
+      - PGPORT=5432
+
+  factorial-handler:
+    build:
+      context: ./src/factorial-handler
+    volumes:
+      - /app/node_modules
+      - ./src/factorial-handler:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_pwd
+      - PGPORT=5432
+
+# daemon-calculator post rewuests on factorial-api and power-api to load containers, we can comment daemon-calculator
+  daemon-calculator:
+    build:
+      context: ./src/calculator-daemon
+    volumes:
+      - /app/node_modules
+      - ./src/calculator-daemon:/app
+    environment:
+      - FACTORIAL_API_HOST=factorial-api
+      - FACTORIAL_API_PORT=5001
+      - POWER_API_HOST=power-api
+      - POWER_API_PORT=5000
