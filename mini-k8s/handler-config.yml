@@ -1,0 +1,77 @@
+#################### factorial
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: factorial-handler-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: factorial-handler
+  template:
+    metadata:
+      labels:
+        app: factorial-handler
+    spec:
+      containers:
+      - name: factorial-handler
+        image: hedimiladi/calculator-factorial-handler
+        ports:
+          - containerPort: 5000
+        env:
+          - name: REDIS_HOST
+            value: redis-service
+          - name: REDIS_PORT
+            value: '6379'
+          - name: PG_USER
+            value: postgres
+          - name: PG_HOST
+            value: postgres-service
+          - name: PG_PORT
+            value: '5432'
+          - name: PG_DATABASE
+            value: postgres
+          - name: PG_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: pgpassword
+                key: PGPASSWORD
+#################### power
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: power-handler-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: power-handler
+  template:
+    metadata:
+      labels:
+        app: power-handler
+    spec:
+      containers:
+      - name: power-handler
+        image: hedimiladi/calculator-power-handler
+        ports:
+          - containerPort: 5001
+        env:
+          - name: REDIS_HOST
+            value: redis-service
+          - name: REDIS_PORT
+            value: '6379'
+          - name: PG_USER
+            value: postgres
+          - name: PG_HOST
+            value: postgres-service
+          - name: PG_PORT
+            value: '5432'
+          - name: PG_DATABASE
+            value: postgres
+          - name: PG_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: pgpassword
+                key: PGPASSWORD
