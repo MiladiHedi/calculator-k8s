@@ -1,0 +1,106 @@
+######################## FACTORIAL
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: factorial-api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: factorial-api
+  template:
+    metadata:
+      labels:
+        app: factorial-api
+    spec:
+      containers:
+        - name: factorial-api
+          image: hedimiladi/calculator-factorial-api
+          ports:
+            - containerPort: 5000
+          env:      
+            - name: OWN_PORT
+              value: '5000'
+            - name: REDIS_HOST
+              value: redis-service
+            - name: REDIS_PORT
+              value: '6379'
+            - name: PG_USER
+              value: postgres
+            - name: PG_HOST
+              value: postgres-service     
+            - name: PG_PORT
+              value: '5432'
+            - name: PG_DATABASE
+              value: postgres
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: factorial-api-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      targetPort: 5000
+  selector:
+    app: factorial-api
+
+  ######################## POWER
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: power-api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: power-api
+  template:
+    metadata:
+      labels:
+        app: power-api
+    spec:
+      containers:
+        - name: power-api
+          image: hedimiladi/calculator-power-api
+          ports:
+            - containerPort: 5001
+          env:      
+            - name: OWN_PORT
+              value: '5001'
+            - name: REDIS_HOST
+              value: redis-service
+            - name: REDIS_PORT
+              value: '6379'
+            - name: PG_USER
+              value: postgres
+            - name: PG_HOST
+              value: postgres-service
+            - name: PG_PORT
+              value: '5432'
+            - name: PG_DATABASE
+              value: postgres
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: power-api-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5001
+      targetPort: 5001
+  selector:
+    app: power-api

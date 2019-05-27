@@ -1,0 +1,29 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calculator-daemon-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calculator-daemon
+  template:
+    metadata:
+      labels:
+        app: calculator-daemon
+    spec:
+      containers:
+      - name: calculator-daemon
+        image: hedimiladi/calculator-daemon
+        ports:
+          - containerPort: 6000
+        env:
+          - name: FACTORIAL_API_HOST
+            value: factorial-api-service
+          - name: FACTORIAL_API_PORT
+            value: '5000'
+          - name: POWER_API_HOST
+            value: power-api-service
+          - name: POWER_API_PORT
+            value: '5001'
