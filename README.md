@@ -2,15 +2,15 @@ calculator-k8s
 =============
 [![Build Status](https://travis-ci.org/MiladiHedi/calculator-k8s.svg?branch=master)](https://travis-ci.org/MiladiHedi/calculator-k8s)
 
-The app is a calculator, it calculate two things ,powers and factorial, when you ask a new operation, the app compute and save in redis and persist on postgres. The calculator-daemon request randomly  factorial and power api to load the cluster.(and agrow logs and consumtion) .
-With this project you can deploy an react app with minikube and aws, and monitor logs and resources consumtion) with kibana and promotheus/grafana.
+The app is a calculator, it calculates powers and factorial. When you request a new operation, the app computes and saves in redis and persisst on postgres. The calculator-daemon request randomly the factorial and power api to load the cluster, agrow logs and consumtion.
+With this project you can deploy an react app with minikube or aws, you can monitor logs with kibana, and resources consumtion with promotheus/grafana.
 
 ## Installation
 
-In this repository  there is two folder on for minikubne (mini-k8s) and an for aws
+In this repository there is two folders "mini-k8s" minikubne and "k8s_aws" for aws
 
 #### minikube
-if you run minkube on a virtual machine (as virtual box), i advise to run : 
+if you run minikube on a virtual machine (as virtual box), i advise to run : 
 ```
 minikube start --vm-driver=none --apiserver-ips 127.0.0.1 --apiserver-name localhost --extra-config=kubelet.resolv-conf=/run/systemd/resolve/resolv.conf
 ```
